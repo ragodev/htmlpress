@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/yosssi/gohtml"
@@ -46,18 +47,24 @@ func loadPats(file string) (pats map[string]int) {
 }
 
 func main() {
-	nextFileNum := "4"
+	nextFileNum := "2"
 	f, _ := os.Create("dat" + nextFileNum)
 
 	defer f.Close()
 
 	dat, err := ioutil.ReadFile("doc" + nextFileNum + ".txt")
 	check(err)
-	formattedHTML := gohtml.Format(string(dat))
-	m := make(map[string]int)
-	m["tally123"] = 0
-	// strInt, _ := strconv.Atoi(nextFileNum)
-	// m := loadPats("dat" + strconv.Itoa(strInt-1) + ".encoding")
+	formattedHTML1 := gohtml.Format(string(dat))
+
+	formattedHTML := ""
+	for _, line := range strings.Split(formattedHTML1, "\n") {
+		formattedHTML += strings.TrimSpace(line + "\n")
+	}
+
+	// m := make(map[string]int)
+	// m["tally123"] = 0
+	strInt, _ := strconv.Atoi(nextFileNum)
+	m := loadPats("dat" + strconv.Itoa(strInt-1) + ".encoding")
 	curWord := ""
 	for _, c := range strings.TrimSpace(formattedHTML) {
 		strC := string(c)
@@ -69,7 +76,7 @@ func main() {
 					// has key
 				} else {
 					m[word] = m["tally123"]
-					m["tally123"] += 1
+					m["tally123"]++
 				}
 				i := byte(0)
 				if curWord == strings.Title(word) {
@@ -80,7 +87,7 @@ func main() {
 				j := byte(m[word] / 254)
 				k := byte(math.Mod(float64(m[word]), 254))
 				fmt.Println(i)
-				d2 := []byte{j, k}
+				d2 := []byte{62, j, k, 60}
 				f.Write(d2)
 				curWord = ""
 			} else {
